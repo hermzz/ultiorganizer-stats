@@ -1,0 +1,12 @@
+{
+    "name": "hermzz/ultiorganizer-stats",
+    "description": "Ultiorganizer stats scraper and processor",
+    "require": {
+        "symfony/console": "v3.x"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}
