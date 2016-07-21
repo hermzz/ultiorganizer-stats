@@ -2,7 +2,8 @@
     "name": "hermzz/ultiorganizer-stats",
     "description": "Ultiorganizer stats scraper and processor",
     "require": {
-        "symfony/console": "v3.x"
+        "symfony/console": "v3.x",
+        "guzzlehttp/guzzle": "6.2.x"
     },
     "autoload": {
         "psr-4": {
