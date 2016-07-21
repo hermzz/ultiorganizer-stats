@@ -3,7 +3,9 @@
     "description": "Ultiorganizer stats scraper and processor",
     "require": {
         "symfony/console": "v3.x",
-        "guzzlehttp/guzzle": "6.2.x"
+        "guzzlehttp/guzzle": "6.2.x",
+        "league/flysystem": "1.0.25",
+        "kevinrob/guzzle-cache-middleware": "v1.4.1"
     },
     "autoload": {
         "psr-4": {
