@@ -6,6 +6,9 @@ require __DIR__.'/../vendor/autoload.php';
 use Symfony\Component\Console\Application;
 use UltiorganizerStats\Command\ScrapeCommand;
 
+define('CACHE_DIR', __DIR__ . '/../cache/');
+define('OUTPUT_FILE', __DIR__ . '/../output.json');
+
 $application = new Application();
 $application->add(new ScrapeCommand());
 $application->run();

@@ -70,7 +70,7 @@ class ScrapeCommand extends Command
                 new CacheMiddleware(
                     new GreedyCacheStrategy(
                         new FlysystemStorage(
-                            new Local(__DIR__.'/cache/')
+                            new Local(CACHE_DIR)
                         ),
                         60 * 60 * 24
                     )
@@ -89,7 +89,7 @@ class ScrapeCommand extends Command
         $games = $this->scrapeGames($divisions);
 
         file_put_contents(
-            __DIR__.'/output.json',
+            OUTPUT_FILE,
             json_encode(
                 [
                     'divisions' => $divisions,
