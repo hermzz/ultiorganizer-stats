@@ -96,6 +96,7 @@ class ScrapeCommand extends Command
         $this->httpClient = new Client(['handler' => $stack]);
 
         $this->urlStructure = parse_url($this->input->getArgument('url'));
+        $this->uppercaseParams = $this->usesUppercaseParams($this->urlStructure['query']);
 
         $doc = $this->get($this->input->getArgument('url'));
         $divisions = $this->scrapeDivisions($doc, $this->input->getOption('skip'));
@@ -113,6 +114,21 @@ class ScrapeCommand extends Command
                 JSON_PRETTY_PRINT
             )
         );
+    }
+
+    /**
+     * Some ultiorganizer instances use ucfirst'd GET
+     * query parameters, let's attempt to figure out
+     * if this is the case
+     *
+     * @param string $query
+     * @return bool
+     */
+    protected function usesUppercaseParams($query)
+    {
+        preg_match('/(s)eason=/i', $query, $matches);
+
+        return $matches[1] === 'S';
     }
 
     /**
@@ -262,7 +278,7 @@ class ScrapeCommand extends Command
         $players = [];
         $query = $xpath->query('//td[@class="tdcontent"]/div/table/tr/td/table/tr/td[2]/a');
         foreach ($query as $node) {
-            preg_match('/player=([0-9]+)/', $node->getAttribute('href'), $matches);
+            preg_match('/player=([0-9]+)/i', $node->getAttribute('href'), $matches);
             $players[$this->cleanText($node->textContent)] = (int) $matches[1];
         }
 
@@ -420,11 +436,14 @@ class ScrapeCommand extends Command
      */
     protected function generateTeamUrl($teamId)
     {
+        $param = $this->uppercaseParams ? 'Team' : 'team';
+
         return sprintf(
-            '%s://%s%s?view=games&team=%d',
+            '%s://%s%s?view=games&%s=%d',
             $this->urlStructure['scheme'],
             $this->urlStructure['host'],
             $this->urlStructure['path'],
+            $param,
             $teamId
         );
     }
@@ -437,11 +456,14 @@ class ScrapeCommand extends Command
      */
     protected function generateRosterUrl($teamId)
     {
+        $param = $this->uppercaseParams ? 'Team' : 'team';
+
         return sprintf(
-            '%s://%s%s?view=playerlist&team=%d',
+            '%s://%s%s?view=playerlist&%s=%d',
             $this->urlStructure['scheme'],
             $this->urlStructure['host'],
             $this->urlStructure['path'],
+            $param,
             $teamId
         );
     }
@@ -454,11 +476,14 @@ class ScrapeCommand extends Command
      */
     protected function generateGameUrl($gameId)
     {
+        $param = $this->uppercaseParams ? 'Game' : 'game';
+
         return sprintf(
-            '%s://%s%s?view=gameplay&game=%d',
+            '%s://%s%s?view=gameplay&%s=%d',
             $this->urlStructure['scheme'],
             $this->urlStructure['host'],
             $this->urlStructure['path'],
+            $param,
             $gameId
         );
     }
