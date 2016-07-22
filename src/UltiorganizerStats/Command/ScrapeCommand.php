@@ -59,6 +59,13 @@ class ScrapeCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Override output file, defaults to /output.json',
                 OUTPUT_FILE
+            )
+            ->addOption(
+                'skip',
+                's',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Names of divisions to skip',
+                []
             );
     }
 
@@ -91,7 +98,7 @@ class ScrapeCommand extends Command
         $this->urlStructure = parse_url($this->input->getArgument('url'));
 
         $doc = $this->get($this->input->getArgument('url'));
-        $divisions = $this->scrapeDivisions($doc);
+        $divisions = $this->scrapeDivisions($doc, $this->input->getOption('skip'));
         $players = $this->scrapePlayers($divisions);
         $games = $this->scrapeGames($divisions);
 
@@ -111,10 +118,11 @@ class ScrapeCommand extends Command
     /**
      * Generates a list of the divisions and the teams in them
      *
-     * @param \DOMDocument
+     * @param \DOMDocument  $doc
+     * @param array         $skipDivisions
      * @return array
      */
-    protected function scrapeDivisions(\DOMDocument $doc)
+    protected function scrapeDivisions(\DOMDocument $doc, $skipDivisions = [])
     {
         $xpath = new \DOMXpath($doc);
         $query = $xpath->query('//td[@class="tdcontent"]/div/table/tr/th');
@@ -123,6 +131,10 @@ class ScrapeCommand extends Command
         $divisionCount = $teamCount = 0;
         foreach ($query as $node) {
             $divisionName = $node->textContent;
+
+            if (in_array($divisionName, $skipDivisions)) {
+                continue;
+            }
 
             $teamRow = $node->parentNode->nextSibling;
             while (!is_null($teamRow)) {
