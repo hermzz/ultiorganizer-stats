@@ -52,6 +52,13 @@ class ScrapeCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Cache the requested HTML',
                 true
+            )
+            ->addOption(
+                'file',
+                'f',
+                InputOption::VALUE_OPTIONAL,
+                'Override output file, defaults to /output.json',
+                OUTPUT_FILE
             );
     }
 
@@ -89,7 +96,7 @@ class ScrapeCommand extends Command
         $games = $this->scrapeGames($divisions);
 
         file_put_contents(
-            OUTPUT_FILE,
+            $this->input->getOption('file'),
             json_encode(
                 [
                     'divisions' => $divisions,
