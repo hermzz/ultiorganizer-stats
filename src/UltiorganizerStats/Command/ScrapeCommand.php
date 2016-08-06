@@ -36,6 +36,9 @@ class ScrapeCommand extends Command
      */
     protected $urlStructure;
 
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -198,7 +201,8 @@ class ScrapeCommand extends Command
 
                     $players[] = [
                         'id' => (int) $matches[1],
-                        'name' => $node->textContent
+                        'name' => $node->textContent,
+                        'team_id' => $team['id']
                     ];
                 }
             }
