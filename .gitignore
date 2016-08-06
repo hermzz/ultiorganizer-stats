@@ -1,3 +1,5 @@
 vendor/
 cache/
+csv/
 output.json
+composer.lock
