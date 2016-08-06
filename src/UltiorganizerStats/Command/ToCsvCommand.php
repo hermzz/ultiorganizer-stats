@@ -32,7 +32,8 @@ class ToCsvCommand extends Command
                 'file',
                 'f',
                 InputOption::VALUE_REQUIRED,
-                'Input JSON file to convert'
+                'Input JSON file to convert',
+                OUTPUT_FILE
             )
             ->addOption(
                 'folder',
