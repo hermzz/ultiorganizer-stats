@@ -26,7 +26,7 @@ class ToCsvCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('tocsv')
+            ->setName('to-csv')
             ->setDescription('Converts JSON output into a set of CSV files')
             ->addOption(
                 'file',

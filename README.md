@@ -52,11 +52,11 @@ Parses the games in the scraped JSON and attempts to guess where halftime should
 
         --time=50
 
-#### tocsv
+#### to-csv
 
 Exports the JSON into a series of flat CSV files
 
-    bin/ultistats tocsv
+    bin/ultistats to-csv
 
 * Change input file
 
