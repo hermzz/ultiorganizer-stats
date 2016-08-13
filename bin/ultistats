@@ -5,6 +5,7 @@ require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 use UltiorganizerStats\Command\FixHalftimeCommand;
+use UltiorganizerStats\Command\GenerateStatsCommand;
 use UltiorganizerStats\Command\ScrapeCommand;
 use UltiorganizerStats\Command\ToCsvCommand;
 
@@ -14,6 +15,7 @@ define('OUTPUT_FILE', ROOT_DIR . 'output.json');
 
 $application = new Application();
 $application->add(new FixHalftimeCommand());
+$application->add(new GenerateStatsCommand());
 $application->add(new ScrapeCommand());
 $application->add(new ToCsvCommand());
 $application->run();
