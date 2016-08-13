@@ -258,7 +258,7 @@ class ScrapeCommand extends Command
      *   teams participating (homeTeam|awayTeam)
      *   who started on offence (onOffence)
      *   a list of scores: (scores)
-     *     what team scored (scoringTeam)
+     *     what team scored (team)
      *     who scored (score)
      *     who threw the assist (assist)
      *     when it started (start)
@@ -340,7 +340,7 @@ class ScrapeCommand extends Command
             $score = isset($players[$scoreName]) ? $players[$scoreName] : null ;
 
             $scores[] = [
-                'scoringTeam' => $children->item(0)->getAttribute('class') == 'guest' ? 'away' : 'home',
+                'team' => $children->item(0)->getAttribute('class') == 'guest' ? 'away' : 'home',
                 'assist' => $assist,
                 'score' => $score,
                 'started' => $time - $duration,
@@ -355,7 +355,7 @@ class ScrapeCommand extends Command
             $onOffence = $div->item(0)->getAttribute('class') == 'guest' ? 'away' : 'home';
         } else {
             // No offence notification, just assume offence was whoever scored first
-            $onOffence = $scores[0]['scoringTeam'];
+            $onOffence = $scores[0]['team'];
         }
 
         /* Grab spirit scores if they exist */

@@ -111,11 +111,11 @@ class ToCsvCommand extends Command
             $halftime = 0;
             $homeScore = $awayScore = 0;
             foreach ($game['scores'] as $k => $score) {
-                if (isset($score['scoringTeam'])) {
-                    ${$score['scoringTeam'].'Score'}++;
+                if (isset($score['team'])) {
+                    ${$score['team'].'Score'}++;
                     $scoreList[] = [
                         $game['id'],
-                        $score['scoringTeam'],
+                        $score['team'],
                         $score['assist'],
                         $score['score'],
                         $score['started'],

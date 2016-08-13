@@ -65,7 +65,7 @@ class GenerateStatsCommand extends Command
             $diff = $homeDiff = $awayDiff = 0;
             foreach ($game['scores'] as $score) {
                 if (is_array($score)) {
-                    $diff = $diff + ($score['scoringTeam'] == 'home' ? 1 : -1); 
+                    $diff = $diff + ($score['team'] == 'home' ? 1 : -1); 
                 }
 
                 if ($diff > 0 && abs($diff) > $homeDiff ) {

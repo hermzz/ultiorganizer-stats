@@ -57,7 +57,7 @@ class FixHalftimeCommand extends Command
 
                 $homeScore = $awayScore = 0;
                 foreach ($game['scores'] as $j => $score) {
-                    ${$score['scoringTeam'].'Score'}++;
+                    ${$score['team'].'Score'}++;
 
                     if (
                         $homeScore == $scoreLimit ||
