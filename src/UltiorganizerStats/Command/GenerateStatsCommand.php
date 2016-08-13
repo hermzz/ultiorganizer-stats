@@ -48,6 +48,7 @@ class GenerateStatsCommand extends Command
         $this->data = json_decode(file_get_contents($this->input->getOption('file')), true);
 
         $this->bestComeback();
+        $this->fewestBreaks();
     }
 
     /**
@@ -120,6 +121,71 @@ class GenerateStatsCommand extends Command
                 )
             );
         }
+
+        $this->output->writeln('');
+    }
+
+    protected function fewestBreaks()
+    {
+        $fewest = [];
+
+        foreach ($this->data['games'] as $game) {
+            $breaks = 0;
+
+            foreach ($game['scores'] as $k => $score) {
+                if (
+                    ($k === 0 && $score['team'] !== $game['onOffence']) ||
+                    ($k > 0 && !is_array($game['scores'][$k-1]) && $score['team'] === $game['onOffence']) ||
+                    ($k > 0 && is_array($score) && is_array($game['scores'][$k-1]) && $score['team'] === $game['scores'][$k-1]['team'])
+                ) {
+                    $breaks++;
+                }
+            }
+
+            $division = $this->getTeamDivision($game['homeTeam']);
+
+            if (!isset($fewest[$division])) {
+                $fewest[$division] = [
+                    'breaks' => INF,
+                    'games' => []
+                ];
+            }
+
+            if ($breaks <= $fewest[$division]['breaks']) {
+                if ($breaks < $fewest[$division]['breaks']) {
+                    $fewest[$division] = [
+                        'breaks' => $breaks,
+                        'games' => [$game]
+                    ];
+                } else if ($fewest[$division]['breaks'] === $breaks) {
+                    $fewest[$division]['games'][] = $game;
+                }
+            }
+        }
+
+        $this->output->writeln('#################');
+        $this->output->writeln('# Fewest breaks #');
+        $this->output->writeln('#################');
+        $this->output->writeln('');
+
+        foreach ($fewest as $division => $few) {
+            $this->output->writeln(sprintf("%s: %s breaks", $division, $few['breaks']));
+
+            foreach ($few['games'] as $game) {
+                $team = $this->getTeam($game['homeTeam']);
+                $opponent = $this->getTeam($game['awayTeam']);
+
+                $this->output->writeln(
+                    sprintf(
+                        "\t%s vs. %s",
+                        $team['name'],
+                        $opponent['name']
+                    )
+                );
+            }
+        }
+
+        $this->output->writeln('');
     }
 
     /**
