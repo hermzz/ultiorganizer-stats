@@ -103,8 +103,9 @@ class ToCsvCommand extends Command
     protected function exportGames($data)
     {
         $gameList = [['ID', 'Home', 'Away', 'Offence', 'HomeScore', 'AwayScore', 'Halftime']];
-        $scoreList = [['GameID', 'Team', 'Assist', 'Score', 'Started', 'Duration']];
-        $timeoutList = [['GameID', 'Team', 'CalledAt']];
+        $scoreList = [['Game', 'Team', 'Assist', 'Score', 'Started', 'Duration']];
+        $timeoutList = [['Game', 'Team', 'CalledAt']];
+        $spiritList = [['Game', 'Team', 'Total', 'Rules', 'Fouls', 'Fair', 'Positive', 'Communication']];
 
         foreach ($data['games'] as $game) {
             $halftime = 0;
@@ -112,7 +113,14 @@ class ToCsvCommand extends Command
             foreach ($game['scores'] as $k => $score) {
                 if (isset($score['scoringTeam'])) {
                     ${$score['scoringTeam'].'Score'}++;
-                    $scoreList[] = [$game['id'], $score['scoringTeam'], $score['assist'], $score['score'], $score['started'], $score['duration']];
+                    $scoreList[] = [
+                        $game['id'],
+                        $score['scoringTeam'],
+                        $score['assist'],
+                        $score['score'],
+                        $score['started'],
+                        $score['duration']
+                    ];
 
                     foreach ($score['timeouts'] as $timeout) {
                         $timeoutList[] = [$game['id'], $timeout['by'], $timeout['at']];
@@ -123,12 +131,53 @@ class ToCsvCommand extends Command
                 }
             }
 
+            if (isset($game['spirit']['home'])) {
+                $spiritList[] = $this->createSpritListItem($game['id'], $game['homeTeam'], $game['spirit']['home']);
+            }
+
+            if (isset($game['spirit']['away'])) {
+                $spiritList[] = $this->createSpritListItem($game['id'], $game['awayTeam'], $game['spirit']['away']);
+            }
+
             $gameList[] = [$game['id'], $game['homeTeam'], $game['awayTeam'], $game['onOffence'], $homeScore, $awayScore, $halftime];
         }
 
         $this->saveCsv($gameList, 'games');
         $this->saveCsv($scoreList, 'scores');
         $this->saveCsv($timeoutList, 'timeouts');
+        $this->saveCsv($spiritList, 'spirit');
+    }
+
+    /**
+     * Creates a flat array for a spirit structure
+     *
+     * @param int $gameId
+     * @param int $teamId
+     * @param array $spirit
+     * @return array
+     */
+    protected function createSpritListItem($gameId, $teamId, $spirit)
+    {
+        $item = [
+            $gameId,
+            $teamId,
+            $spirit['total']
+        ];
+
+        if (isset($spirit['breakdown'])) {
+            $item = array_merge(
+                $item,
+                [
+                    $spirit['breakdown']['rules'],
+                    $spirit['breakdown']['fouls'],
+                    $spirit['breakdown']['fair'],
+                    $spirit['breakdown']['positive'],
+                    $spirit['breakdown']['communication']
+                ]
+            );
+        }
+
+        return $item;
     }
 
     /**

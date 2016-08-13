@@ -37,6 +37,11 @@ class ScrapeCommand extends Command
     protected $urlStructure;
 
     /**
+     * @var array Keys for the spirit breakdown array
+     */
+    protected $spiritBreakdownKeys = ['rules', 'fouls', 'fair', 'positive', 'communication'];
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
@@ -353,15 +358,60 @@ class ScrapeCommand extends Command
             $onOffence = $scores[0]['scoringTeam'];
         }
 
+        /* Grab spirit scores if they exist */
+        $spirit = null;
+        $query = $xpath->query('//td[@class="tdcontent"]/div/table[last()]/tr[last()]');
+        if ($query->length > 0) {
+            $node = $query->item(0);
+
+            $homeSpirit = $this->processSpiritNode($xpath, $node, 'home');
+            $awaySpirit = $this->processSpiritNode($xpath, $node, 'guest');
+
+            $spirit = [
+                'home' => $homeSpirit,
+                'away' => $awaySpirit
+            ];
+        }
+
         $game = [
             'id' => $gameId,
             'homeTeam' => $homeTeamId,
             'awayTeam' => $awayTeamId,
             'onOffence' => $onOffence,
-            'scores' => $scores
+            'scores' => $scores,
+            'spirit' => $spirit
         ];
 
         return $game;
+    }
+
+    /**
+     * Extracts spirit scores and details from a node
+     *
+     * @param DOMXpath $xpath
+     * @param DOMElement $node
+     * @param string $type
+     * @return array
+     */
+    protected function processSpiritNode(\DOMXpath $xpath, \DOMElement $node, $type)
+    {
+        $spirit = null;
+        $query = $xpath->query('td[@class="' . $type . '"]', $node);
+        if ($query->length === 1) {
+            $value = $query->item(0)->textContent;
+
+            if (preg_match('/([0-9]+) \(([0-9\+]+)\)/', $value, $matches)) {
+                $spirit = [
+                    'total' => (int) $matches[1],
+                    'breakdown' => array_combine(
+                        $this->spiritBreakdownKeys,
+                        array_map(function ($m) { return (int) $m; }, explode('+', $matches[2]))
+                    )
+                ];
+            }
+        }
+
+        return $spirit;
     }
 
     /**
